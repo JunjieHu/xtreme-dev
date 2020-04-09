@@ -17,11 +17,11 @@ LC=""
 if [ $MODEL == "bert-base-multilingual-cased" ]; then
   MODEL_TYPE="bert"
   DIM=768
-elif [ $MODEL == "xlm-mlm-100-1280" ]; then
+elif [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-mlm-tlm-xnli15-1024" ]; then
   MODEL_TYPE="xlm"
   DIM=1280
   LC=" --do_lower_case"
-elif [ $MODEL == "xlm-roberta-large" ]; then
+elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ]; then
   MODEL_TYPE="xlmr"
   DIM=1024
   NLAYER=24

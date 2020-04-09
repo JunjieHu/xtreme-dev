@@ -14,10 +14,11 @@ LR=3e-5
 NUM_EPOCHS=2.0
 if [ $MODEL == "bert-base-multilingual-cased" ]; then
   MODEL_TYPE="bert"
-elif [ $MODEL == "xlm-mlm-100-1280" ]; then
+elif [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-mlm-tlm-xnli15-1024" ]; then
   MODEL_TYPE="xlm"
+  LC=" --do_lower_case"
 elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ]; then
-  MODEL_TYPE="xlm-roberta"
+  MODEL_TYPE="xlmr"
 fi
 
 # Model path where trained model should be stored
@@ -33,28 +34,28 @@ else
 fi 
 
 # train
-# CUDA_VISIBLE_DEVICES=$GPU python third_party/run_squad.py \
-#   --model_type ${MODEL_TYPE} \
-#   --model_name_or_path ${MODEL} \
-#   --do_lower_case \
-#   --do_train \
-#   --do_eval \
-#   --train_file ${TRAIN_FILE} \
-#   --predict_file ${PREDICT_FILE} \
-#   --per_gpu_train_batch_size 3 \
-#   --learning_rate ${LR} \
-#   --num_train_epochs ${NUM_EPOCHS} \
-#   --max_seq_length $MAXL \
-#   --doc_stride 128 \
-#   --save_steps -1 \
-#   --overwrite_output_dir \
-#   --gradient_accumulation_steps 4 \
-#   --warmup_steps 500 \
-#   --output_dir ${MODEL_PATH} \
-#   --weight_decay 0.0001 \
-#   --threads 8 \
-#   --train_lang en \
-#   --eval_lang en
+CUDA_VISIBLE_DEVICES=$GPU python third_party/run_squad.py \
+  --model_type ${MODEL_TYPE} \
+  --model_name_or_path ${MODEL} \
+  --do_lower_case \
+  --do_train \
+  --do_eval \
+  --train_file ${TRAIN_FILE} \
+  --predict_file ${PREDICT_FILE} \
+  --per_gpu_train_batch_size 4 \
+  --learning_rate ${LR} \
+  --num_train_epochs ${NUM_EPOCHS} \
+  --max_seq_length $MAXL \
+  --doc_stride 128 \
+  --save_steps -1 \
+  --overwrite_output_dir \
+  --gradient_accumulation_steps 4 \
+  --warmup_steps 500 \
+  --output_dir ${MODEL_PATH} \
+  --weight_decay 0.0001 \
+  --threads 8 \
+  --train_lang en \
+  --eval_lang en
 
 
 # predict

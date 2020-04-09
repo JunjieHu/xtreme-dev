@@ -44,13 +44,14 @@ def panx_tokenize_preprocess(args):
           label = 'O'
         current_subwords_len = len(tokenizer.tokenize(token))
 
-        if current_subwords_len == 0:
-          continue
+        if (current_subwords_len == 0 or current_subwords_len > max_seq_len) and len(token) != 0:
+          token = tokenizer.unk_token
+          current_subwords_len = 1
 
         if (subword_len_counter + current_subwords_len) > max_seq_len:
           fout.write(f"\n{token}\t{label}\n")
           fidx.write(f"\n{idx}\n")
-          subword_len_counter = 0
+          subword_len_counter = current_subwords_len
         else:
           fout.write(f"{token}\t{label}\n")
           fidx.write(f"{idx}\n")
@@ -73,9 +74,12 @@ def panx_tokenize_preprocess(args):
       infile = os.path.join(args.data_dir, f'{file}-{lang}.tsv')
       outfile = os.path.join(out_dir, "{}.{}".format(file, args.model_name_or_path))
       idxfile = os.path.join(out_dir, "{}.{}.idx".format(file, args.model_name_or_path))
-      code = _preprocess_one_file(infile, outfile, idxfile, tokenizer, args.max_len)
-      if code > 0:
-        print(f'finish preprocessing {outfile}')
+      if os.path.exists(outfile) and os.path.exists(idxfile):
+        print(f'{outfile} and {idxfile} exist')
+      else:
+        code = _preprocess_one_file(infile, outfile, idxfile, tokenizer, args.max_len)
+        if code > 0:
+          print(f'finish preprocessing {outfile}')
 
 
 def panx_preprocess(args):
@@ -157,8 +161,11 @@ def udpos_tokenize_preprocess(args):
       infile = os.path.join(args.data_dir, "{}-{}.tsv".format(file, lang))
       outfile = os.path.join(out_dir, "{}.{}".format(file, args.model_name_or_path))
       idxfile = os.path.join(out_dir, "{}.{}.idx".format(file, args.model_name_or_path))
-      _preprocess_one_file(infile, outfile, idxfile, tokenizer, args.max_len)
-      print(f'finish preprocessing {outfile}')
+      if os.path.exists(outfile) and os.path.exists(idxfile):
+        print(f'{outfile} and {idxfile} exist')
+      else:
+        _preprocess_one_file(infile, outfile, idxfile, tokenizer, args.max_len)
+        print(f'finish preprocessing {outfile}')
 
 
 def udpos_preprocess(args):
